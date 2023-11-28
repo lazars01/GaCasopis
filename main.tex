@@ -1,0 +1,170 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[hyperref={bookmarks=false}]{beamer}
+
+\usetheme{CambridgeUS}
+\setbeamercolor{bibliography entry author}{fg=black}
+\setbeamercolor{item}{fg=darkred}
+\setbeamercolor{caption name}{fg=darkred}
+\beamertemplatenavigationsymbolsempty
+\bibliography{references}
+
+
+
+\usepackage[serbianc]{babel}
+\usepackage{type1ec}
+\usepackage{cmap}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{amsmath} 
+\usepackage{biblatex}
+
+\title{Aproksimacija najdužeg razapinjućeg stabla sa okolinama}
+\author[Lazar Stanojević]{Lazar Stanojević\\\small mi231013@alas.matf.bg.ac.rs}
+\institute[]{Geometrijski algoritmi\\Matematički fakultet, Univerzitet u Beogradu}
+\date[Matematički fakultet]{28. novembar 2023.}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Sadržaj}
+\tableofcontents[subsectionstyle=show]
+\end{frame}
+
+\section{Opšte o autorima i radu}
+\subsection{Autori}
+\begin{frame}{Autori}
+\begin{itemize}
+\item Journal of Computational Geometry, Vol 14. No. 1 (2023)
+\item Tema: Approximating longest spanning tree with neighborhoods
+\item \textbf{Ahmad Biniaz}
+\begin{itemize}
+    \item \url{https://cglab.ca/~biniaz/} - lična stranica
+    \item ahmad.biniaz@gmail.com
+    \item PhD in Computer Science from Carleton University, Ottawa, Canada, 2013-2017.
+    \item Interesovanja: algoritmi i strukture podataka, diskretna i računarska geometrija, diskretna matematika
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Opis problema}
+\begin{frame}{Opis problema}
+\begin{itemize}
+    \item Problem maksimizacije u Euklidskoj ravni
+    \item Dat je skup okolina/susedstva (unija prostih poligona), ne nužno disjunktnih
+    \item Potrebno izabrati po tačku iz svake okoline, tako da najduže razapinjuće stablo nad tim tačkama ima maksimalnu dužinu
+\end{itemize}
+\end{frame}
+
+
+\section{Osnovni pojmovi}
+\begin{frame}{Osnovni pojmovi}
+\begin{itemize}
+\item \textit{Zvezda} sa centrom u čvoru p, je stablo u kom je svaka grana susedna sa čvorom p
+\item \textit{Dupla zvezda} sa centrom u čvorovima p i q, je stablo koje sadrži granu pq i svaka druga grana je susedna ili sa p ili sa q
+\item \textit{Najmanji zatvarajući disk} skupa tačaka P, je najmanji disk koji sadrži sve tačke iz P
+\item \textit{Dijametralni par} skupa P su tačke p i q takve da dostižu najveće euklidsko rastojanje
+\item \textit{Bihromatski dijametralni par} skupa P čine tačke p i q, različite boje, takve da je rastojanje između njih maksimalno, uz pretpostavku da su tačke u skupu P obojene
+\item \textit{Centar mase} skupa P (centroid), je tačka \textit{m} u ravni, takva da za svaku proizvolju tačku \textit{u} važi: 
+\[
+\sum_{p \in P} \overrightarrow{up} = |P| \cdot \overrightarrow{um}
+\]
+\end{itemize}
+\end{frame}
+
+\section{Jednostavan algoritam}
+\begin{frame}{Jednostavan algoritam}
+\begin{itemize}
+\item Chen i Dumitrescu
+\item Uzmimo bihromatski par (a, b) od tačaka iz n datih okolina
+\item Formiramo zvezdu $S_a$, povezujući a sa b, i a sa proizvoljnom tačkom iz svake ostale okoline
+\item Formiramo analogno $S_b$
+\item Dužina svake grane optimalnog rešenja T je najviše |ab|, odatle je $len(T) \leq (n-1)\cdot|ab|$
+\item Iz nejednakosti trougla imamo: $S_a + S_b \ge n\cdot|ab| \ge len(T)$
+\item Sledi da je duža od dve zvezde 0.5-aproksimativno rešenje problema
+\end{itemize}    
+\end{frame}
+
+\section{Napredniji algoritam}
+\subsection{Opis}
+\begin{frame}{Opis}
+\begin{itemize}
+    \item 0.548-aproksimativno rešenje problema
+    \item Izračunavamo razapinjuću duplu zvezdu D, i najviše tri razapnjuće zvezde, $S_1, S_2$ i $S_3$
+    \item Nađemo (a, b) bihromatski dijametralni par, i za svaku od preostalih okolina, nađemo tačku $p$ koja je najdalja od $a$, i tačku $q$ koja je najdalja od $b$
+    \item Ako je $|ap| \ge |bq|$ u $D$ dodajemo $p$, inače dodajemo $q$
+    \item Zbog nejednakosti trouglova, svaka grana u $D$ je dužine bar $|ab|/2$
+    \item Neka je $C$ najmanji zatvarajući disk za $X$ (skup svih okolina)
+    \item Ako $C$ sadrži tačno dve tačke iz $X$, onda zvezde centriramo u njima
+    \item U suprotnom, biramo tri tačke tako da trougao koji formiraju sadrži centar diska $C$, i njih postavljamo za centre razapinjućih zvezdi
+\end{itemize}
+\end{frame}
+
+\subsection{Složenost}
+\begin{frame}{Složenost}
+\begin{itemize}
+    \item Najmanji zavarajući disk možemo da izračunamo u O(N) vremenskoj složenosti, gde je N broj tačaka koje opisuju svih $n$ okolina
+    \item Bihromatski dijametralni par možemo naći za O($N\cdot \log N\cdot \log n$)
+    \item Ostatak algoritma uzima linearno vreme, O(N)
+\end{itemize}
+\end{frame}
+
+\subsection{Analiza faktora aproksimacije}
+\begin{frame}{Analiza}
+\begin{itemize}
+    \item Glavna ideja: pokazati da ako je radijus diska $C$ bar $\delta = \frac{\sqrt{7}-1}{3} \approx 0.548$, onda je neka od zvezda $S_i$ željeno stablo, u suprotnom je to dupla zvezda $D$
+    \item Lema 1: Ako je $r \ge \delta$ i granica diska $C$ sadrži tačno dve tačke, onda je $max(len(S_1), len(S_2)) \ge \delta \cdot len(T)$, gde je T optimalno rešenje
+    \item Lema 2: Ako granica diska C sadrži tri ili više tački, onda za svaku tačku $m$ u ravni, postoji tačka $c_j \in {c_1, c_1, c_3}$ takva da je $|c_jm| \ge r$
+    \item Lema 3: Ako je $r \ge \delta$ i granica diska $C$ sadrži tri ili više tačaka, onda je $max(len(S_1), len(S_2), len(S_3)) \ge \delta \cdot len(T)$
+    \item Lema 4: Ako je $r \leq \delta$ onda je $len(D) \ge \delta \cdot len(T)$
+\end{itemize}
+\end{frame}
+
+\section{Doprinos, primene i srodni problemi}
+\subsection{Doprinos}
+\begin{frame}{Doprinos}
+\begin{itemize}
+    \item Glavni doprinos rada je sledeća teorema:
+    \begin{itemize}
+        \item 0.548-aproksimacija može da bude izračunata u linearnom vremenu nakon nalaženja bihromatskog dijametra
+    \end{itemize}
+    \item Poboljšan je faktor aproksimacije, sa do tada najboljeg 0.517 na 0.548
+    \item Dokazano je da algoritam koji uvek uključuje bihromatski dijametar u rešenje ne može da ima faktor aproksimacije veći od 0.5
+\end{itemize}
+\end{frame}
+\subsection{Primene i srodni problemi}
+\begin{frame}{Primene i srodni problemi}
+\begin{itemize}
+    \item Primene:
+    \begin{itemize}
+        \item Analiza najgoreg slučaja u raznim heuristikama, u kombinatornoj optimizaciji
+        \item Aproksimacija maksimalnih triangulacija
+        \item Algoritmi klasterovanja
+    \end{itemize}
+    \item Srodni problemi:
+    \begin{itemize}
+        \item Problem euklidskog Steinerovog stabla
+        \item Problem trgovačkog putnika sa okolinama
+        \item Konveksni omotač nepreciznih tačaka
+    \end{itemize}
+ 
+\end{itemize}   
+\end{frame}
+
+\section{Zaključak}
+\begin{frame}{Zaključak}
+\begin{itemize}
+    \item Otvoren je problem daljeg poboljšanja algoritama aproksimacije
+    \item Za to je potrebna detaljnija analiza
+    \item Razmatrane su zvezde i dupla zvezda razdvojeno, možda bi posmatranje zajedno dovelo do poboljšanja
+\end{itemize}
+    
+\end{frame}
+
+\section{Literatura}
+\begin{frame}{Literatura}
+\begin{itemize}
+    \item Approximating longest spanning tree with neighborhoods, Ahmad Biniaz, Journal of Computational Geometry, Vol. 14 No. 1, Pages 1-13, 4.4.2023. 
+\end{itemize}
+\end{frame}
+\end{document}
